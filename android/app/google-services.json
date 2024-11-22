@@ -1,0 +1,32 @@
+{
+  "project_info": {
+    "project_number": "733645855492",
+    "project_id": "example-a85c9",
+    "storage_bucket": "example-a85c9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:733645855492:android:7f0538c399594067dd8e51",
+        "android_client_info": {
+          "package_name": "com.example.psychologicaltestapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqU96gQlZGrz7Gv8QrnoqbBHCuhsh3TLU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      },
+      "project_info": {
+        "firebase_url": "https://example-a85c9-default-rtdb.firebaseio.com"
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
