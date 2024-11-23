@@ -16,6 +16,10 @@ class MainListPage extends StatefulWidget {
 
 class _MainListPageState extends State<MainListPage> {
 
+  FirebaseDatabase database = FirebaseDatabase.instance;
+  late DatabaseReference _testRef;
+  late List<String> testList = List.empty(growable: true);
+
   String welcomeTitle = '';
   bool bannerUse = false;
   int itemHeight = 50;
@@ -24,6 +28,7 @@ class _MainListPageState extends State<MainListPage> {
   void initState(){
     super.initState();
     remoteConfigInit();
+    _testRef = database.ref('test');
   }
 
   void remoteConfigInit() async{
@@ -33,8 +38,11 @@ class _MainListPageState extends State<MainListPage> {
     itemHeight = remoteConfig.getInt('item_banner');
   }
 
-  Future<String> loadAsset() async{
-    return await rootBundle.loadString('res/api/list.json');
+  Future<List<String>> loadAsset() async{
+    await _testRef.get().then((value) => value.children.forEach((element) {
+      testList.add(element.value.toString());
+    }));
+    return testList;
   }
 
   @override
@@ -58,22 +66,21 @@ class _MainListPageState extends State<MainListPage> {
                   child: CircularProgressIndicator(),
                 );
               case ConnectionState.done:
-                Map<String, dynamic> list = jsonDecode(snapshot.data!);
-                return Center(
-                  child: SizedBox(
+                return SizedBox(
                     child: ListView.builder(
                       shrinkWrap: true,
                       itemBuilder: (context, value){
+                        Map<String, dynamic> item = jsonDecode(snapshot.data![value]);
                         return InkWell(
                           child: SizedBox(
-                            height: itemHeight.toDouble(),
+                            height: remoteConfig.getInt("item_height").toDouble(),
                             // height: 100,
                             child: Card(
                               elevation: 1,
                               color: Colors.white,
                               child: Center(
                                 child: Text(
-                                    list['questions'][value]['title'].toString(),
+                                    item['title'].toString(),
                                   style: const TextStyle(fontSize: 20),
                                 ),
                               ),
@@ -86,22 +93,21 @@ class _MainListPageState extends State<MainListPage> {
                               name: "test_click",
                               parameters: {
                                 "test_name":
-                                    list['questions'][value]['title'].toString(),
+                                    item['title'].toString(),
                               },
                             ).then((result) {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) {
-                                    return QuestionPage(question: list['questions'][value]['file'].toString());
+                                    return QuestionPage(question: item);
                                   }
                               ));
                             });
                           },
                         );
                       },
-                      itemCount: list['count'],
+                      itemCount: snapshot.data!.length,
                     ),
-                  ),
-                );
+                  );
               case ConnectionState.none:
                 return const Center(
                   child: Text('No Data'),
@@ -113,6 +119,9 @@ class _MainListPageState extends State<MainListPage> {
             }
           }
       ),
+
+
+
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () async{
@@ -167,10 +176,3 @@ class _MainListPageState extends State<MainListPage> {
   }
 }
 
-
-// {
-// "rules": {
-// ".read": "now < 1734706800000",  // 2024-12-21
-// ".write": "now < 1734706800000",  // 2024-12-21
-// }
-// }
